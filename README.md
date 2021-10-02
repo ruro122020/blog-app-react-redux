@@ -11,15 +11,19 @@
 7. Some reducer sees the action, returns the data off the 'payload'
 8. Since we generated some new state object, redux/reat-redux causes our React app to be rerendered
 
-## Redux Thunk
-
-Redux thunk is a middleware that helps use make api request in redux
-
 ## Redux
 
 1. Action creators must return plain JS object with a type property and optionally a payload.
 
-2.
+2. A Synchornous action creator instantly returns an action with data ready to go.
+
+3. An Asynchronous action creator takes some amount of time for it to get its data ready to go. Any time there is a network request done in an action creator it'll be asynchronous.
+
+4. If you want to make an API call in an action creator you need middleware that will allow you to handle asynchronous action creators.
+
+## Redux Thunk
+
+Redux thunk is a middleware that helps make api request in action creators
 
 # Getting Started with Create React App
 
