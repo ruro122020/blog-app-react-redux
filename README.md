@@ -1,3 +1,26 @@
+# Notes
+
+## General Data Loading with Redux
+
+1. Component gets rendered onto the screen
+2. Component's "componentDidMount" lifecycle method gets called
+3. We call action creator from "componentDidMount"
+4. Action creator runs code to make an API request
+5. API responds with data
+6. Action creator returns an 'action' with the fetched data on the 'payload' property
+7. Some reducer sees the action, returns the data off the 'payload'
+8. Since we generated some new state object, redux/reat-redux causes our React app to be rerendered
+
+## Redux Thunk
+
+Redux thunk is a middleware that helps use make api request in redux
+
+## Redux
+
+1. Action creators must return plain JS object with a type property and optionally a payload.
+
+2.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
