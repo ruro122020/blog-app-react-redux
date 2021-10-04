@@ -1,6 +1,6 @@
 # Notes
 
-## Redux
+## Redux Actions
 
 1. Normal behavior of Action Creators inside a vanilla redux application are as follows:
 
@@ -13,6 +13,45 @@
 3. An Asynchronous action creator takes some amount of time for it to get its data ready to go. Any time there is a network request done in an action creator it'll be asynchronous.
 
 4. If you want to make an API call in an action creator you need middleware that will allow you to handle asynchronous action creators.
+
+## Redux Reducers
+
+1. Reducers must return _any_ value besides 'undefined'
+2. Reducers must produce 'state', or data to be used inside of your app using only previous state and the action.
+   The first time a reducer is called it's going to be undefined so giving it a default value will fix this problem. When the reducer gets called again, the value of the variable will use the state that it changed to previously and the action.
+
+```
+                                    default value
+                                          |
+                                          V
+const someReducerName = (variableName = null, action) => {}
+```
+
+3. Reducers must not mutate its input 'state' argument.
+
+Mutations examples in javascript:
+
+```
+const arr = ["red", "green"];
+arr.push("purple") // output ["red", "green", "purple"]
+arr.pop() // output ["red", "green"]
+
+const obj = {name: "Sam"}
+
+obj.name = "Greg" // output {name: "Greg"}
+obj.age = 30 // output {name: "Greg", age:30}
+```
+
+In javascript strings and numbers are immutable values.
+
+```
+const name = "Sam"
+name[0] = "X" // output would still be "Sam"
+```
+
+So if you have a reducer returning a string or a number you don't have to worry about this mutation rule. If you're returning an object or an array make sure you're not mutating it in the reducer.
+
+4. Reducers should not go beyond its scoping purposes. Reducers are only suppose to look at state and action and use those 2 parameters to return a new state. They should be making API calls, accessing the DOM, etc.
 
 ## Redux Cycle
 
