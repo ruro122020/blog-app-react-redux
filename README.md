@@ -27,7 +27,9 @@
 const someReducerName = (variableName = null, action) => {}
 ```
 
-3. Reducers must not mutate its input 'state' argument.
+3. Reducers should not go beyond its scoping purposes. Reducers are only suppose to look at state and action and use those 2 parameters to return a new state. They should be making API calls, accessing the DOM, etc.
+
+4. Reducers must not mutate its input 'state' argument.
 
 - Mutations examples in javascript you can do in a reducer:
 
@@ -64,7 +66,7 @@ const someReducerName = (variableName = null, action) => {}
   array1 === array2 // false
   ```
 
-**Redux Reducer Code**
+_Redux Reducer Code_
 
 This code can be found [here](https://github.com/reduxjs/redux/blob/master/src/combineReducers.ts)
 
@@ -124,13 +126,93 @@ const reducer (state, action) => {
   state.name = 'Kevin'
   state.age = 20
 
-  //redux will return the old state and will not rerender your changes to your application because of how javascript compares
-  //objects/arrays
+  //redux will return the old state and will not rerender your changes to your application because of how javascript compares objects
   return state
 }
 ```
 
-4. Reducers should not go beyond its scoping purposes. Reducers are only suppose to look at state and action and use those 2 parameters to return a new state. They should be making API calls, accessing the DOM, etc.
+```
+const state = [1, 2, 3]
+
+const reducer (state, action) => {
+  state.push(4)
+  state.pop()
+
+  //redux will return the old state and will not rerender your changes to your application because of how javascript compares arrays
+  return state
+}
+```
+
+**Proper way to change state in reducers**
+
+_Manipulating arrays without mutating them_
+
+1. Adding an element to an array
+
+```
+const colors = ['red', 'green']
+//creates a new array in memory without changing the original colors array.
+[...colors, 'blue', 'purple']
+//output ['red', 'green', 'blue', 'purple']
+or
+['blue', 'purple', ...colors]
+//output ['blue', 'purple','red', 'green']
+```
+
+2. Removing an element from an array
+
+```
+const colors = ['red', 'green']
+//filter function returns a new array and original colors array is unchanged
+colors.filter(color => color !== 'green')
+//output ["red"]
+
+```
+
+3. Replacing/updating an element in an array
+
+```
+const colors = ['red', 'green']
+//map function returns a new array and original colors array is unchanged
+colors.map(el => el === 'red' ? 'blue': el)
+//output ['blue', 'green']
+
+```
+
+_Manipulating objects without mutating them_
+
+1. Adding a key/value to an object
+
+```
+const profile = {name: 'Alex'}
+//creates a new object in memory without changing the original profile object.
+{...profile, age: 30}
+//output {name: 'Alex', age: 30}
+```
+
+2. Removing a key/value from an object. Since javascript uses `delete` to remove a key/value from an object and it doesn't create a new object, we will need to make use of the lodash library.
+
+```
+const profile = {name: 'Alex'}
+//creates a new object in memory without changing the original profile object.
+//_.omit takes 2 arguments. 1st the name of the object. 2nd the name of the key you want to delete
+_.omit(profile, name)
+//output {}
+
+//without using lodash
+{...profile, name: undefined}
+//output {name: undefined}
+
+```
+
+3.  Replacing/updating a key/value in an object
+
+```
+const profile = {name: 'Alex'}
+//creates a new object in memory without changing the original profile object.
+{...profile, name: 'Robert'}
+//output {name: 'Robert'}
+```
 
 ## Redux Cycle
 
