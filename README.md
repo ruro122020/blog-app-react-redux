@@ -29,27 +29,106 @@ const someReducerName = (variableName = null, action) => {}
 
 3. Reducers must not mutate its input 'state' argument.
 
-Mutations examples in javascript:
+- Mutations examples in javascript you can do in a reducer:
+
+  ```
+  const arr = ["red", "green"];
+  arr.push("purple") // output ["red", "green", "purple"]
+  arr.pop() // output ["red", "green"]
+
+  const obj = {name: "Sam"}
+
+  obj.name = "Greg" // output {name: "Greg"}
+  obj.age = 30 // output {name: "Greg", age:30}
+  ```
+
+- In javascript strings and numbers are immutable values.
+
+  ```
+  const name = "Sam"
+  name[0] = "X" // output would still be "Sam"
+  ```
+
+  If you have a reducer returning a string or a number you don't have to worry about this mutation rule. If you're returning an object or an array make sure you're not mutating it in the reducer.
+
+- The output for comparing objects and arrays with the same values will be false. This happens cause javascript stores objects and arrays in different memory locations. So obj1 is stored in a memory location and obj2 is stored in a different memory location. Same for array1 and array2. The comparison is between whether or not obj1 is referencing the exact same object in memory as in obj2, not the contents of the object. Same goes for array1 and array2. Since it doesn't then the result will be false.
+
+  ```
+  //comparing objects and arrays
+  const obj1 = {name: "Sally"}
+  const obj2 = {name: "Sally"}
+  obj1 === obj2 // false
+
+  const array1 = [1, 2, 3]
+  const array2 = [1, 2, 3]
+  array1 === array2 // false
+  ```
+
+**Redux Reducer Code**
+
+This code can be found [here](https://github.com/reduxjs/redux/blob/master/src/combineReducers.ts)
 
 ```
-const arr = ["red", "green"];
-arr.push("purple") // output ["red", "green", "purple"]
-arr.pop() // output ["red", "green"]
+function combination (state={}, action){
+  /*Some code*/
 
-const obj = {name: "Sam"}
+  /* this code is at the very bottom of the combinedReducers.js file in redux-thunk. This section of the code explains exactly what it means not to mutate state in reducers. Any time you dispatch an action this block of code is executed*/
 
-obj.name = "Greg" // output {name: "Greg"}
-obj.age = 30 // output {name: "Greg", age:30}
+  //hasChanged will determine what gets returned from your reducers
+  let hasChanged = false
+  const nextState = {}
+
+  // this 'for loop' iterates over all the different reducers you pass as an object into combinedReducers in your application
+  for(let i = 0; i < finalReducerKeys.length; i++){
+    const key = finalReducerKeys[i];
+    const reducer = finalReducers[key]
+
+    // this variable is assigned the last state value that this particular reducer (that we are iterating over) returned when it was last invoked
+    const previousStateForKey = state[key]
+
+    //This is where the reducer we are iterating over is invoked. The first argument is the state that the reducer
+    //returned the last time it ran. Second argument is the action we passed in. When this reducer gets invoked again it'll return a
+    //new state value. That new state value will be assigned to the 'nextStateForKey' variable.
+    const nextStateForKey = reducer(previousStateForKey, action)
+
+      //This code checks to see if your reducer returned a value of undefined and will throw an error if it did.
+      if(typeof nextStateForKey === 'undefined'){
+        const errorMessage = getUndefinedStateErrorMessage(key, action)
+        throw new Error(errorMessage)
+      }
+
+    nextState[key] = nextStateForKey
+
+    //This line explains what redux-thunk means when they say not to mutate your state.
+    //This checks to see if nextStateForKey and previousStateForKey are the exact same array or object in memory.
+    //If your current object/array state is in the same memory location as your previous state, hasChanged will be false.
+    //If your current object/array state is in a new memory location than your previous state, hasChanged will be true.
+    hasChanged = hasChanged || nextStateForKey !== previousStateForKey
+  }
+  //If hasChanged is false the result is to return state which is a referrence to ALL the state that your reducers returned the last
+  //time they were invoked
+  //If hasChanged is true the result is to return the new state object/array that has been assembled by ALL of your different reducers
+  return hasChanged ? nextState : state
+}
+
 ```
 
-In javascript strings and numbers are immutable values.
+> Important Note: `hasChanged` is a variable that determines your state changes for all reducers. Not just the particular one that was being iterated over. So after the 'for loop' iterated through all your reducers, `hasChanged` will determine whether there was a new object/array in a different memory location in any of your reducers and the returns either the new object/array or keeps everything the same. It's an all or nothing kind of thing.
+
+If redux returns the old state value even if the contents in the object/array was changed, its not going to notify your application that state has changed and the application will not rerender and receive any changes that where made within the object/array. This is why you don't want to "mutate" state.
 
 ```
-const name = "Sam"
-name[0] = "X" // output would still be "Sam"
-```
+const state = {name: 'Rob', age: 30}
 
-So if you have a reducer returning a string or a number you don't have to worry about this mutation rule. If you're returning an object or an array make sure you're not mutating it in the reducer.
+const reducer (state, action) => {
+  state.name = 'Kevin'
+  state.age = 20
+
+  //redux will return the old state and will not rerender your changes to your application because of how javascript compares
+  //objects/arrays
+  return state
+}
+```
 
 4. Reducers should not go beyond its scoping purposes. Reducers are only suppose to look at state and action and use those 2 parameters to return a new state. They should be making API calls, accessing the DOM, etc.
 
