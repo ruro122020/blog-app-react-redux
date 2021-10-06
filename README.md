@@ -72,7 +72,7 @@ This code can be found [here](https://github.com/reduxjs/redux/blob/master/src/c
 function combination (state={}, action){
   /*Some code*/
 
-  /* this code is at the very bottom of the combinedReducers.js file in redux-thunk. This section of the code explains exactly what it means not to mutate state in reducers. Any time you dispatch an action this block of code is executed*/
+  /* this code is at the very bottom of the combinedReducers.js file in redux github. This section of the code explains exactly what it means not to mutate state in reducers. Any time you dispatch an action this block of code is executed*/
 
   //hasChanged will determine what gets returned from your reducers
   let hasChanged = false
